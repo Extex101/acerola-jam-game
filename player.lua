@@ -18,7 +18,7 @@ end
 ---Update Camera
 function Player:cameraUpdate()
    local x = Camera:cameraCoords(self.x, 0)
-   local w = love.graphics.getWidth()-200
+   local w = love.graphics.getWidth()
    -- print(x, w-200)
    if x > w/2 or x < w/2 then
       Camera:lookAt(math.lerp(Camera.x, self.x, 0.05), Camera.y)
@@ -29,6 +29,9 @@ function Player:cameraUpdate()
    
    if Camera.x < limits.min then
       Camera:lookAt(limits.min, Camera.y)
+   end
+   if Camera.x > limits.max then
+      Camera:lookAt(limits.max, Camera.y)
    end
 end
 

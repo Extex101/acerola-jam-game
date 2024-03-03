@@ -2,7 +2,7 @@ local rooms = {}
 rooms.lounge = {
     bounds = {
         min = -40,
-        max = 80
+        max = 400
     },
     props = {
         Prop(400, 10, {

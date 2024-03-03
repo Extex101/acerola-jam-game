@@ -28,6 +28,7 @@ function Text:new(x, y, text, align, col, rot)
     self.text = text or ""
     self.align = align or "center"
     self.col = col or 1
+    if not col then self.col = 1 end
     self.rot = rot or 0
 end
 

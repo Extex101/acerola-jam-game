@@ -23,6 +23,13 @@ function Player:cameraUpdate()
    if x > w/2 or x < w/2 then
       Camera:lookAt(math.lerp(Camera.x, self.x, 0.05), Camera.y)
    end
+   local limits = rooms[self.room].bounds
+   local minx, miny = Camera:cameraCoords(rooms[self.room].bounds.min, -math.huge)
+   local maxx, maxy = Camera:cameraCoords(rooms[self.room].bounds.max, math.huge)
+   
+   if Camera.x < limits.min then
+      Camera:lookAt(limits.min, Camera.y)
+   end
 end
 
 ---Run player controller

@@ -37,3 +37,4 @@ function Game.inputs()
      end
      
 end
+return Game

@@ -2,8 +2,7 @@
 love.window.setMode(1200,600)
 FLOOR_HEIGHT = 500
 require("lib.init")
-require("game")
-
+rooms = {}
 player = require("player")()
 Prop = require("prop")
 require("gui")

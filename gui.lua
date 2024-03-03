@@ -9,46 +9,35 @@ local function drawCenteredText(rectX, rectY, rectWidth, rectHeight, text, align
 	love.graphics.printf(text, math.floor(rectX), math.floor(rectY+rectHeight/2-textHeight/2), rectWidth, align, rot or 0)
 end
 
+---@class Text
+---@field text string
+---@field pos table
+---@field align string
+---@field col number
+---@field rot number
 Text = Object:extend()
-function Text:new(x, y, w, h, text, align, col, rot)
+---comment
+---@param x number
+---@param y number
+---@param text string
+---@param align string
+---@param col number
+---@param rot number
+function Text:new(x, y, text, align, col, rot)
     self.pos = Vector(x, y)
     self.text = text or ""
-    self.align = align "center"
-    self.col = col or 0
+    self.align = align or "center"
+    self.col = col or 1
     self.rot = rot or 0
 end
 
 function Text:draw()
-    local pos = self.pos - (self.size/2)
     love.graphics.setColor(self.col, self.col, self.col)
-    love.graphics.printf(self.text, pos.x, pos.y, math.huge, self.align, self.rot)
-end
-function Text:over()
-    local pos = self.pos - (self.size/2)
-    if over(pos.x, pos.y, self.size.x, love.mouse.getX(), love.mouse.getY()) then
-        return true
-    end
-    return false
+    love.graphics.printf(self.text, self.pos.x, self.pos.y, math.huge, self.align, self.rot)
 end
 
 function Text:setPos(vec)
     self.pos = vec
-end
-
-function Text:left(vec)
-    return vec:clone() - Vector(self.size.x/2, 0)
-end
-
-function Text:right(vec)
-    return vec:clone() + Vector(self.size.x/2, 0)
-end
-
-function Text:top(vec)
-    return vec:clone() - Vector(0, self.size.y/2)
-end
-
-function Text:bottom(vec)
-    return vec:clone() + Vector(0, self.size.y/2)
 end
 
 Button = Object:extend()
@@ -68,19 +57,17 @@ function Button:run()
 end
 
 function Button:draw()
-    local pos = self.pos - (self.size/2)
     if self:over() then
         love.graphics.setColor(1, 0.9, 0.9, 0.1)
-        love.graphics.rectangle("fill", pos.x, pos.y, self.size.x, self.size.y)
+        love.graphics.rectangle("fill", self.pos.x, self.pos.y, self.size.x, self.size.y)
     end
     if self.text then
         love.graphics.setColor(1, 1, 1)
-        drawCenteredText(pos.x, pos.y, self.size.x, self.size.y, self.text, "center", 0)
+        drawCenteredText(self.pos.x, self.pos.y, self.size.x, self.size.y, self.text, "center", 0)
     end
 end
 function Button:over()
-    local pos = self.pos - (self.size/2)
-    if over(pos.x, pos.y, self.size.x, self.size.y, love.mouse.getX(), love.mouse.getY()) then
+    if over(self.pos.x, self.pos.y, self.size.x, self.size.y, love.mouse.getX(), love.mouse.getY()) then
         return true
     end
     return false
@@ -91,24 +78,25 @@ function Button:setPos(vec)
 end
 
 function Button:left(vec)
-    return vec:clone() - Vector(self.size.x/2, 0)
+    return vec:clone()
 end
 
 function Button:right(vec)
-    return vec:clone() + Vector(self.size.x/2, 0)
+    return vec:clone() + Vector(self.size.x, 0)
 end
 
 function Button:top(vec)
-    return vec:clone() - Vector(0, self.size.y/2)
+    return vec:clone()
 end
 
 function Button:bottom(vec)
-    return vec:clone() + Vector(0, self.size.y/2)
+    return vec:clone() + Vector(0, self.size.y)
 end
 
 UI.visible = false
 UI.images = {}
 UI.buttons = {}
+UI.text = {}
 
 
 local canvasWidth = love.graphics.getWidth()
@@ -147,10 +135,17 @@ function UI.show(def)
     local limit = center + (scale/2)
     if UI.content.buttons then
         for index, buttonDef in ipairs(UI.content.buttons) do
-            UI.buttons[index] = Button(0, 0, buttonDef.w, buttonDef.h, buttonDef.func, buttonDef.image, buttonDef.text)
-            local x = math.lerp(UI.buttons[index]:right(pos).x, UI.buttons[index]:left(limit).x, buttonDef.x)
-            local y = math.lerp(UI.buttons[index]:bottom(pos).y, UI.buttons[index]:top(limit).y, buttonDef.y)
+            UI.buttons[index] = Button(0, 0, buttonDef.w*def.scale, buttonDef.h*def.scale, buttonDef.func, buttonDef.image, buttonDef.text)
+            local x = math.lerp(pos.x, limit.x, buttonDef.x/UI.images[def.background]:getWidth())
+            local y = math.lerp(pos.y, limit.y, buttonDef.y/UI.images[def.background]:getHeight())
             UI.buttons[index]:setPos(Vector(x, y))
+        end
+    end
+    if UI.content.text then
+        for index, textDef in ipairs(UI.content.text) do
+            local x = math.lerp(pos.x, limit.x, textDef.x)
+            local y = math.lerp(pos.y, limit.y, textDef.y)
+            UI.text[index] = Text(x, y, textDef.text, textDef.align, textDef.col, textDef.rot)
         end
     end
 end
@@ -172,29 +167,31 @@ function UI.draw()
         local pos = center - (scale/2)
         local limit = center + (scale/2)
 
-        fill(0, 0, 0, 60)
+        love.graphics.setColor(0, 0, 0, UI.content.bg)
         love.graphics.rectangle("fill", 0, 0, canvasWidth, canvasHeight)
 
-        fill(100, 100, 100)
+        love.graphics.setColor(1, 1, 1)
         love.graphics.draw(UI.image(content.background), pos.x, pos.y, 0, content.scale, content.scale)
         love.graphics.ellipse("fill", center.x, center.y, 10, 10)
         love.graphics.setColor(1, 1, 1)
-        for index, button in ipairs(UI.buttons) do
-            button:draw(love.mouse.getPosition())
+        for _, button in ipairs(UI.buttons) do
+            button:draw()
+        end
+        for _, text in ipairs(UI.text) do
+            text:draw()
         end
     end
 end
 
 function UI:run()
     if UI.visible and UI.content then
-        local content = UI.content
         local center = Vector(canvasWidth/2, canvasHeight/2)
         local scale = UI.content.bgDimensions
         local pos = center - (scale/2)
         if not over(pos.x, pos.y, scale.x, scale.y, love.mouse.getX(), love.mouse.getY()) and clicked then
             UI.remove()
         end
-        for index, button in ipairs(UI.buttons) do
+        for _, button in ipairs(UI.buttons) do
             button:run()
         end
     end

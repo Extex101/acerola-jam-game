@@ -1,0 +1,7 @@
+Object = require("lib.classic")
+require("lib/assorted")
+spriteManager = require("lib.spritemanager")
+Camera = require("lib.camera")
+Camera = Camera(love.graphics.getWidth()/2, FLOOR_HEIGHT/2)
+Timer = require("lib.timer")
+Vector = require("lib.vector")

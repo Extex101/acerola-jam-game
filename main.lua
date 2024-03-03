@@ -6,6 +6,7 @@ end
 
 function love.load(arg)
    require("init")
+   Game = require("game")
    Game.inputs()
 end
 

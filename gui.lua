@@ -1,4 +1,6 @@
 UI = {}
+local canvasWidth = love.graphics.getWidth()
+local canvasHeight = love.graphics.getHeight()
 
 
 local function drawCenteredText(rectX, rectY, rectWidth, rectHeight, text, align, rot)
@@ -34,7 +36,7 @@ end
 
 function Text:draw()
     love.graphics.setColor(self.col, self.col, self.col)
-    love.graphics.printf(self.text, self.pos.x, self.pos.y, math.huge, self.align, self.rot)
+    love.graphics.printf(self.text, self.pos.x, self.pos.y, canvasWidth, self.align, self.rot)
 end
 
 function Text:setPos(vec)
@@ -55,6 +57,10 @@ function Button:run()
     if self:over() and clicked then
         self.func(self)
     end
+end
+
+function Text:setPos(vec)
+    self.pos = vec
 end
 
 function Button:draw()
@@ -100,8 +106,6 @@ UI.buttons = {}
 UI.text = {}
 
 
-local canvasWidth = love.graphics.getWidth()
-local canvasHeight = love.graphics.getHeight()
 -- Get a list of items in the specified folder
 local items = love.filesystem.getDirectoryItems("/ui")
 
@@ -144,9 +148,9 @@ function UI.show(def)
     end
     if UI.content.text then
         for index, textDef in ipairs(UI.content.text) do
-            local x = math.lerp(pos.x, limit.x, textDef.x)
-            local y = math.lerp(pos.y, limit.y, textDef.y)
-            UI.text[index] = Text(x, y, textDef.text, textDef.align, textDef.col, textDef.rot)
+            local x = math.lerp(pos.x, limit.x, textDef.x/UI.images[def.background]:getWidth())
+            local y = math.lerp(pos.y, limit.y, textDef.y/UI.images[def.background]:getHeight())
+            UI.text[index] = Text(x, y, textDef.text, textDef.align, textDef.col, math.rad(textDef.rot))
         end
     end
 end
@@ -181,6 +185,14 @@ function UI.draw()
         for _, text in ipairs(UI.text) do
             text:draw()
         end
+        -- if UI.content.text then
+        --     for index, textDef in ipairs(UI.content.text) do
+        --         local x = math.lerp(pos.x, limit.x, textDef.x/UI.images[content.background]:getWidth())
+        --         local y = math.lerp(pos.y, limit.y, textDef.y/UI.images[content.background]:getHeight())
+        --         print(textDef.text, x, y, math.huge, textDef.align or "center", textDef.rot or 0)
+        --         love.graphics.printf(textDef.text, 300, 300, canvasWidth, textDef.align or "center", textDef.rot or 0)
+        --     end
+        -- end
     end
 end
 

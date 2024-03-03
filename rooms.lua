@@ -28,7 +28,7 @@ rooms.lounge = {
                     },
                     text = {
                         {
-                            x=0.2, y=0.5, 
+                            x=22, y=15, 
                             text = "I'm invisible, yes I truly am invisible",
                             col = 1,
                             align = "center",
@@ -63,7 +63,6 @@ rooms.bedroom1 = {
                         {
                             x=16, y=4,
                             w=4, h=10,
-                            text = "K",
                             func = function ()
                                 print("Help me")
                             end
@@ -71,7 +70,6 @@ rooms.bedroom1 = {
                         {
                             x=26, y=4,
                             w=4, h=10,
-                            text = "A",
                             func = function ()
                                 print("Help me")
                             end
@@ -79,7 +77,6 @@ rooms.bedroom1 = {
                         {
                             x=38, y=4,
                             w=4, h=10,
-                            text = "B",
                             func = function ()
                                 print("Help me")
                             end
@@ -88,11 +85,18 @@ rooms.bedroom1 = {
                     },
                     text = {
                         {
-                            x=0.2, y=0.5, 
-                            text = "I'm invisible, yes I truly am invisible",
+                            x=19, y=5, 
+                            text = "Cool Book",
                             col = 1,
-                            align = "center",
-                            rot = 0,
+                            align = "left",
+                            rot = 90,
+                        },
+                        {
+                            x=29, y=5.5, 
+                            text = "Bad Book",
+                            col = 0,
+                            align = "left",
+                            rot = 90,
                         }
                     }
                 })

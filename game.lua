@@ -1,5 +1,9 @@
 Game = {}
 
+Game.AIs = {AI("lounge", -40, {
+   target = "bedroom1_bookshelf"
+})}
+
 function Game.update(dt)
     Timer.update(dt)
     UI:run()
@@ -17,9 +21,13 @@ end
 
 function Game.inputs()
     function love.mousepressed(x, y, button, isTouch)
-        if not Game.canClick(x, y) then goto noClick end
-        player:click(Camera:worldCoords(x, y))
-        ::noClick::
+      if not Game.canClick(x, y) then goto noClick end
+      player:click(Camera:worldCoords(x, y))
+      if button == 2 then
+         Game.AIs[1].pathIndex = 1
+         Game.AIs[1]:walkPath()
+      end
+      ::noClick::
      end
      
      function love.mousereleased(x, y, button, isTouch)

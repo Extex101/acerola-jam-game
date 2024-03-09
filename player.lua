@@ -4,7 +4,7 @@ Player = Object:extend()
 
 ---Create new Player
 function Player:new()
-   self.room = "bedroom1"
+   self.room = "lounge"
    self.x = 500
    self.px = 300
    self.hidden = false
@@ -14,6 +14,7 @@ function Player:new()
    self.aimAnim = 0
    self.aimAnimLength = 1
    self.roomFade = 0
+   self.player = true
 end
 ---Update Camera
 function Player:cameraUpdate()
@@ -47,14 +48,17 @@ function Player:run(dt)
    --If the distance from the aim is less than 5 then stop walking and interact
    if math.abs(self.x - self.aim) < 5 and self.walking then
       if self.interaction then
-         self.interaction()
+         self.interaction(self)
       end
       self.walking = false
+   end
+   for _, ai in ipairs(Game.AIs) do
+      ai:run(dt)
    end
    if self.aimAnim > 0 then
       self.aimAnim = self.aimAnim - dt
    end
-   for _, prop in ipairs(rooms[self.room].props) do
+   for _, prop in pairs(rooms[self.room].props) do
       if prop.click then
          prop:run()
       end
@@ -66,8 +70,14 @@ function Player:run(dt)
    self:cameraUpdate(dt)
 end
 function Player:draw()
-   for _, prop in ipairs(rooms[self.room].props) do
+   for _, prop in pairs(rooms[self.room].props) do
       prop:draw()
+   end
+
+   for _, ai in ipairs(Game.AIs) do
+      if ai.room == self.room then
+         ai:draw()
+      end
    end
 
    love.graphics.setColor(1, 0, 0)

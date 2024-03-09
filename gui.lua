@@ -159,6 +159,7 @@ function UI.remove()
     UI.visible = false
     UI.content = {}
     UI.buttons = {}
+    UI.text = {}
 end
 
 function UI.image(id)

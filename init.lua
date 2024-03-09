@@ -7,6 +7,7 @@ player = require("player")()
 Prop = require("prop")
 require("gui")
 rooms = require("rooms")
+AI = require("ai")
 clicked = false
 keyReleased = {}
 keyPressed = {}

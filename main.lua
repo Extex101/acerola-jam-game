@@ -12,7 +12,7 @@ end
 
 function love.update(dt)
    player:run(dt)
-   Game.update()
+   Game.update(dt)
 end
 
 function love.draw()

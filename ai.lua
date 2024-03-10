@@ -4,17 +4,26 @@ AI = Object:extend()
 
 ---@class routineDef
 ---@field timer table
-AI("lounge", 100, {
-    {0.1, "bedroom1_bookshelf"},
-    {0.2, "lounge_chair"},
-    {0.5, "lounge_door_bedroom1"}
-})
+-- AI("lounge", 100, {
+--     {0.1, "bedroom1_bookshelf"},
+--     {0.2, "lounge_chair"},
+--     {0.5, "lounge_door_bedroom1"}
+-- })
 ---Create new AI
 ---comment
 ---@param room string
 ---@param x number 
 ---@param routine routineDef
 function AI:new(room, x, routine)
+   self.doorSound = love.audio.newSource("media/door.mp3", "static")
+   self.sounds = {
+      footsteps = {}
+   }
+   for i = 1, 5 do
+      table.insert(self.sounds.footsteps, love.audio.newSource("media/footstep."..i..".ogg", "static"))
+   end
+   self.footstepTimer = 0
+   self.doorSound:setVolume(1.5)
    self.room = room or "bedroom1"
    self.preRoom = ""
    self.x = x or 300
@@ -89,6 +98,8 @@ function AI:interaction()
    if prop[2] == "door" then
       print("Interaction: "..prop[3])
       self:changeRoom(prop[3], prop[3].."_"..prop[2].."_"..prop[1], self.aim.pos.x + self.aim.w/2)
+      self.doorSound:stop()
+      self.doorSound:play()
       self.pathIndex = self.pathIndex + 1
       self:walkPath()
    else
@@ -101,6 +112,7 @@ end
 ---Run AI controller
 ---@param dt number deltaTime
 function AI:run(dt)
+   
    self.px = self.x
    -- print(self.room)
    if self.aim.pos then
@@ -108,6 +120,15 @@ function AI:run(dt)
       --The lerp speed is clamped to a max speed, so the AI will ease out when approaching the aim point
       self.x = self.x + math.max(math.min((math.lerp(self.x, self.aim.pos.x + self.aim.w/2, 0.1)-self.x), 300*dt), -300*dt)
    end
+
+   self.footstepTimer = self.footstepTimer + dt
+   if self.footstepTimer > 0.5 and math.abs(self.px-self.x) > 1 and player.room == self.room then
+      local n = math.random(1, #self.sounds.footsteps)
+      self.sounds.footsteps[n]:stop()
+      self.sounds.footsteps[n]:play()
+      self.footstepTimer = 0
+   end
+
    --If the distance from the aim is less than 5 then stop walking and interact
    if self.aim.pos then
       print(self.x..", "..self.aim.pos.x)
